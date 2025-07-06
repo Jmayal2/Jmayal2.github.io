@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purifica al Bicéfalo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: black;
+            color: white;
+            overflow: hidden;
+            transition: all 1s ease;
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .scenario {
+            display: none;
+            animation: fadeIn 1s ease;
+        }
+
+        .scenario.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-large {
+            font-size: 2.5rem;
+            margin: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .text-medium {
+            font-size: 1.8rem;
+            margin: 15px;
+            line-height: 1.6;
+        }
+
+        .button {
+            background: linear-gradient(45deg, #ff6b9d, #ff8fab);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+        }
+
+.lupita-silhouette {
+    width: 200px;
+    height: 300px;
+    background: linear-gradient(180deg, #333 0%, #555 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    margin: 30px;
+    animation: float 3s ease-in-out infinite;
+    position: relative;
+}
+
+.character-image {
+    width: 200px;
+    height: auto;
+    margin: 30px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.bicefalo-image {
+    width: 150px;
+    animation: bicefaloBreath 2s ease-in-out infinite;
+}
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .lupita-silhouette::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: #666;
+            border-radius: 50%;
+        }
+
+        .fog-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(100,100,100,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 60%, rgba(150,150,150,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120,120,120,0.1) 0%, transparent 50%);
+            animation: fogMove 4s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes fogMove {
+            0% { transform: translateX(-10px) translateY(-5px); }
+            100% { transform: translateX(10px) translateY(5px); }
+        }
+
+        .vibration {
+            animation: vibrate 0.5s ease-in-out infinite;
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        .icons-container {
+            display: flex;
+            gap: 40px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .floating-icon {
+            font-size: 4rem;
+            animation: floatIcon 2s ease-in-out infinite;
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-8px) rotate(2deg); }
+            66% { transform: translateY(-4px) rotate(-2deg); }
+        }
+
+        .module-buttons {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .module-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.4rem;
+            color: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .module-button:disabled {
+            background: linear-gradient(45deg, #888, #666);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .module-button:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .module-button.completed {
+            background: linear-gradient(45deg, #2E7D32, #388E3C);
+            position: relative;
+        }
+
+        .module-button.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .question-text {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-button {
+            background: linear-gradient(45deg, #36d1dc, #5b86e5);
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option-button:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(54, 209, 220, 0.4);
+        }
+
+        .correct-answer {
+            background: linear-gradient(45deg, #4CAF50, #45a049) !important;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .wrong-answer {
+            background: linear-gradient(45deg, #f44336, #d32f2f) !important;
+            animation: wrongShake 0.6s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b9d, #ff8fab);
+            transition: width 0.5s ease;
+            z-index: 1000;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            animation: celebrate 1s ease;
+            z-index: 1001;
+        }
+
+        @keyframes celebrate {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .bicefalo-visual {
+            width: 150px;
+            height: 120px;
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            margin: 20px;
+            position: relative;
+            animation: bicefaloBreath 2s ease-in-out infinite;
+        }
+
+        @keyframes bicefaloBreath {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .bicefalo-visual::before,
+        .bicefalo-visual::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #FF4500;
+            border-radius: 50%;
+            top: 20px;
+        }
+
+        .bicefalo-visual::before { left: 20px; }
+        .bicefalo-visual::after { right: 20px; }
+
+        .final-report {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px;
+            max-width: 600px;
+        }
+
+        .lightening-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+
+        @media (max-width: 768px) {
+            .text-large { font-size: 2rem; }
+            .text-medium { font-size: 1.4rem; }
+            .question-card { margin: 10px; padding: 20px; }
+            .module-buttons { flex-direction: column; align-items: center; }
+            .icons-container { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+<audio id="buttonSound" src="click.wav"></audio>
+    <div class="score-display" id="scoreDisplay" style="display: none;">
+        Correctas: <span id="correctCount">0</span> | Incorrectas: <span id="wrongCount">0</span>
+    </div>
+
+    <div class="game-container">
+<!-- Escenario 1: Despertar -->
+<div class="scenario active" id="scenario1">
+    <div class="text-large">Hola, gracias por despertar, administrador.</div>
+    <button class="button" onclick="nextScenario(2)">Comenzar</button>
+</div>
+
+        <!-- Escenario 2: La Silueta -->
+        <div class="scenario" id="scenario2">
+           <img src="lupita.png" alt="Doctora Guadalupe" class="character-image">
+            <div class="text-medium">Soy yo, la Doctora Guadalupe... pero me puedes decir Lupita.</div>
+            <button class="button" onclick="nextScenario(3)">Siguiente</button>
+        </div>
+
+        <!-- Escenario 3: El llamado -->
+        <div class="scenario" id="scenario3">
+           <img src="lupita.png" alt="Doctora Guadalupe" class="character-image">
+            <div class="text-medium">Necesito que me ayudes, estudiante. El Bicéfalo se ha despertado y su caos amenaza nuestra facultad.</div>
+            <button class="button" onclick="nextScenario(4)">Siguiente</button>
+        </div>
+
+        <!-- Escenario 4: La amenaza -->
+        <div class="scenario" id="scenario4">
+            <div class="fog-effect"></div>
+            <div class="vibration">
+                <div class="text-medium">El Bicéfalo tiene dos cabezas: una representa la desorganización; la otra, la desidia. Solo tú puedes enfrentarlo...</div>
+            </div>
+            <button class="button" onclick="nextScenario(5)">Siguiente</button>
+        </div>
+
+        <!-- Escenario 5: La prueba -->
+        <div class="scenario" id="scenario5">
+           <img src="lupita.png" alt="Doctora Guadalupe" class="character-image">
+            <div class="text-medium">Pero para purificarlo, deberás demostrar que dominas tres áreas clave...</div>
+            <div class="icons-container">
+                <div class="floating-icon">📊</div>
+                <div class="floating-icon">🧑‍</div>
+                <div class="floating-icon">📦</div>
+            </div>
+            <div class="text-medium">Estrategia Administrativa - Recursos Humanos - Logística</div>
+            <button class="button" onclick="nextScenario(6)">Comenzar prueba</button>
+        </div>
+
+        <!-- Escenario 6: Elegir camino -->
+        <div class="scenario" id="scenario6">
+            <div class="text-medium">Elige por qué área quieres empezar:</div>
+            <div class="module-buttons" id="moduleButtons">
+                <button class="module-button" onclick="startModule('administracion')" id="btn-administracion">Administración</button>
+                <button class="module-button" onclick="startModule('recursos')" id="btn-recursos">Recursos Humanos</button>
+                <button class="module-button" onclick="startModule('logistica')" id="btn-logistica">Logística</button>
+            </div>
+            <div class="text-medium" style="margin-top: 20px;">
+                Módulos completados: <span id="completedModules">0</span>/3
+            </div>
+        </div>
+
+        <!-- Escenario de preguntas -->
+        <div class="scenario" id="questionScenario">
+            <div class="question-card">
+                <div class="question-text" id="questionText"></div>
+                <div class="options-container" id="optionsContainer"></div>
+            </div>
+        </div>
+
+        <!-- Escenario 30: Última prueba -->
+        <div class="scenario" id="scenario30">
+    <img src="lupita.png" alt="Doctora Guadalupe" class="character-image">
+        <img src="bicefalo.png" alt="Bicéfalo" class="character-image bicefalo-image">
+            <div class="text-medium">¡Listo! Ya completamos los módulos. Dale tu conocimiento al bicéfalo para que lo ayudes a purificarse</div>
+            <div style="display: flex; gap: 20px; margin-top: 30px;">
+                <button class="button" onclick="purifyBicefalo(true)">Purificar</button>
+                <button class="button" onclick="purifyBicefalo(false)">No purificar</button>
+            </div>
+        </div>
+
+        <!-- Escenario 31: Resultado positivo -->
+        <div class="scenario lightening-bg" id="scenario31">
+            <div class="celebration" id="celebration">🎉</div>
+        <img src="lupita.png" alt="Doctora Guadalupe" class="character-image">
+            <div class="text-large">¡Lo lograste!</div>
+            <div class="text-medium">El Bicéfalo ha sido purificado. Eres digno del título de Administrador Supremo.</div>
+            <button class="button" onclick="showFinalReport()">Ver Informe Final</button>
+        </div>
+
+        <!-- Escenario 32: Resultado negativo -->
+        <div class="scenario" id="scenario32">
+       <img src="bicefalo.png" alt="Bicéfalo" class="character-image bicefalo-image">
+            <div class="text-medium">El Bicéfalo sigue con vida... pero has aprendido. Vuelve a intentarlo y purifícalo por completo.</div>
+            <button class="button" onclick="showFinalReport()">Ver Informe Final</button>
+            <button class="button" onclick="restartGame()">Reintentar</button>
+        </div>
+
+        <!-- Informe Final -->
+        <div class="scenario" id="finalReport">
+            <div class="final-report">
+                <h2>📊 Informe Final</h2>
+                <div id="reportContent"></div>
+                <button class="button" onclick="restartGame()">Jugar de Nuevo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado del juego
+        let gameState = {
+            currentScenario: 1,
+            currentModule: '',
+            currentQuestion: 0,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            completedModules: [],
+            bicefaloWasPurified: false, // Nueva variable para rastrear si se purificó
+            moduleResults: {
+                administracion: { correct: 0, total: 5 },
+                recursos: { correct: 0, total: 5 },
+                logistica: { correct: 0, total: 5 }
+            }
+        };
+
+function playButtonSound() {
+            const sound = document.getElementById('buttonSound');
+            if (sound) {
+                sound.play();
+            }
+        }
+        // Preguntas por módulo
+        const questions = {
+            administracion: [
+                {
+                    question: "¿Cuál es la principal función de la administración estratégica?",
+                    options: [
+                        "a) Organizar equipos de trabajo",
+                        "b) Establecer metas a largo plazo",
+                        "c) Controlar inventarios",
+                        "d) Realizar entrevistas laborales"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "¿Qué nivel de administración se enfoca en el día a día?",
+                    options: [
+                        "a) Estratégico",
+                        "b) Táctico",
+                        "c) Operativo",
+                        "d) Directivo"
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "¿Cuál de las siguientes NO es una función administrativa según Fayol?",
+                    options: [
+                        "a) Planear",
+                        "b) Coordinar",
+                        "c) Auditar",
+                        "d) Controlar"
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "¿Qué herramienta se utiliza comúnmente para analizar fortalezas y debilidades internas?",
+                    options: [
+                        "a) Matriz BCG",
+                        "b) FODA",
+                        "c) PESTEL",
+                        "d) Diagrama de Gantt"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "¿Cuál es una decisión táctica en una empresa?",
+                    options: [
+                        "a) Expandirse a otro país",
+                        "b) Comprar maquinaria para el mes",
+                        "c) Definir visión y misión",
+                        "d) Contratar directores generales"
+                    ],
+                    correct: 1
+                }
+            ],
+            recursos: [
+                {
+                    question: "¿Qué es una entrevista por competencias?",
+                    options: [
+                        "a) Una entrevista informal",
+                        "b) Una conversación libre",
+                        "c) Una evaluación basada en habilidades demostradas",
+                        "d) Una entrevista en grupo"
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "¿Qué busca el proceso de reclutamiento?",
+                    options: [
+                        "a) Capacitar al personal",
+                        "b) Aumentar ventas",
+                        "c) Atraer candidatos potenciales",
+                        "d) Realizar auditorías"
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "¿Cuál es el propósito principal de una evaluación de desempeño?",
+                    options: [
+                        "a) Despedir empleados",
+                        "b) Medir la productividad individual",
+                        "c) Hacer inventarios",
+                        "d) Calcular sueldos"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "¿Qué es la rotación de personal?",
+                    options: [
+                        "a) Cambio de turnos",
+                        "b) Cambio voluntario o involuntario de empleados",
+                        "c) Formación interna",
+                        "d) Ajuste salarial"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "¿Qué elemento es esencial en un contrato laboral?",
+                    options: [
+                        "a) Nombre del jefe directo",
+                        "b) Descripción del clima laboral",
+                        "c) Jornada laboral y salario",
+                        "d) Color del uniforme"
+                    ],
+                    correct: 2
+                }
+            ],
+            logistica: [
+                {
+                    question: "¿Qué es el picking en logística?",
+                    options: [
+                        "a) Controlar el transporte",
+                        "b) Selección y recolección de productos para un pedido",
+                        "c) Verificar nóminas",
+                        "d) Planificar el marketing"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "¿Qué función cumple el inventario?",
+                    options: [
+                        "a) Analizar el clima laboral",
+                        "b) Controlar costos de personal",
+                        "c) Registrar la mercancía disponible",
+                        "d) Diseñar campañas"
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "¿Qué es el lead time?",
+                    options: [
+                        "a) Tiempo que tarda un cliente en pagar",
+                        "b) Tiempo desde que se hace un pedido hasta su entrega",
+                        "c) Tiempo de descanso del personal",
+                        "d) Tiempo estimado de uso del producto"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "¿Cuál es una ventaja de una buena logística?",
+                    options: [
+                        "a) Aumenta el estrés laboral",
+                        "b) Disminuye la productividad",
+                        "c) Mejora la satisfacción del cliente",
+                        "d) Reduce la innovación"
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "¿Qué es la logística inversa?",
+                    options: [
+                        "a) Distribuir productos hacia adelante",
+                        "b) Devolver productos desde el cliente hacia la empresa",
+                        "c) Almacenar productos en bodegas",
+                        "d) Transportar solo materias primas"
+                    ],
+                    correct: 1
+                }
+            ]
+        };
+
+        function nextScenario(scenarioNumber) {
+         playButtonSound();
+            document.querySelectorAll('.scenario').forEach(s => s.classList.remove('active'));
+            document.getElementById(`scenario${scenarioNumber}`).classList.add('active');
+            gameState.currentScenario = scenarioNumber;
+            
+            if (scenarioNumber >= 6) {
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                document.getElementById('scoreDisplay').style.display = 'block';
+            }
+            
+            updateProgress();
+        }
+
+        function startModule(moduleName) {
+           
+            if (gameState.completedModules.includes(moduleName)) {
+                return; 
+            }
+            
+            gameState.currentModule = moduleName;
+            gameState.currentQuestion = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const module = gameState.currentModule;
+            const questionIndex = gameState.currentQuestion;
+            const question = questions[module][questionIndex];
+            
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+            
+            document.querySelectorAll('.scenario').forEach(s => s.classList.remove('active'));
+            document.getElementById('questionScenario').classList.add('active');
+            
+            updateProgress();
+        }
+
+        function selectAnswer(selectedIndex) {
+            const module = gameState.currentModule;
+            const questionIndex = gameState.currentQuestion;
+            const question = questions[module][questionIndex];
+            const buttons = document.querySelectorAll('.option-button');
+            
+            // Deshabilitar todos los botones
+            buttons.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                // Respuesta correcta
+                buttons[selectedIndex].classList.add('correct-answer');
+                gameState.correctAnswers++;
+                gameState.moduleResults[module].correct++;
+                showCelebration('✅ ¡Correcto!');
+            } else {
+                // Respuesta incorrecta
+                buttons[selectedIndex].classList.add('wrong-answer');
+                buttons[question.correct].classList.add('correct-answer');
+                gameState.wrongAnswers++;
+                showCelebration('❌ Incorrecto');
+            }
+            
+            updateScore();
+            
+            // Continuar después de 2 segundos
+            setTimeout(() => {
+                gameState.currentQuestion++;
+                
+                if (gameState.currentQuestion >= questions[module].length) {
+                    // Módulo completado
+                    gameState.completedModules.push(module);
+                    
+                    if (gameState.completedModules.length >= 3) {
+                        // Todos los módulos completados
+                        nextScenario(30);
+                    } else {
+                        // Volver a seleccionar módulo
+                        nextScenario(6);
+                        updateCompletedModules();
+                    }
+                } else {
+                    // Siguiente pregunta
+                    showQuestion();
+                }
+            }, 2000);
+        }
+
+        function showCelebration(message) {
+            const celebration = document.getElementById('celebration');
+            if (celebration) {
+                celebration.textContent = message;
+                celebration.style.display = 'block';
+                setTimeout(() => {
+                    celebration.style.display = 'none';
+                }, 1500);
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('correctCount').textContent = gameState.correctAnswers;
+            document.getElementById('wrongCount').textContent = gameState.wrongAnswers;
+        }
+
+        function updateCompletedModules() {
+            document.getElementById('completedModules').textContent = gameState.completedModules.length;
+            
+            // Deshabilitar botones de módulos completados
+            gameState.completedModules.forEach(module => {
+                const button = document.getElementById(`btn-${module}`);
+                if (button) {
+                    button.disabled = true;
+                    button.classList.add('completed');
+                }
+            });
+        }
+
+        function updateProgress() {
+            const totalQuestions = 15; // 5 preguntas por 3 módulos
+            const answeredQuestions = gameState.correctAnswers + gameState.wrongAnswers;
+            const progress = (answeredQuestions / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function purifyBicefalo(purify) {
+ playButtonSound();
+            const totalScore = gameState.correctAnswers;
+            const passingScore = 12; // Necesita al menos 12/15 para aprobar
+            
+            gameState.bicefaloWasPurified = purify && totalScore >= passingScore;
+            
+            if (purify && totalScore >= passingScore) {
+                nextScenario(31);
+            } else {
+                nextScenario(32);
+            }
+        }
+
+       function showFinalReport() {
+    const reportContent = document.getElementById('reportContent');
+    const totalQuestions = gameState.correctAnswers + gameState.wrongAnswers;
+    const percentage = Math.round((gameState.correctAnswers / totalQuestions) * 100);
+    reportContent.innerHTML = `
+        <h3>Resultados por Módulo:</h3>
+        <p><strong>Administración:</strong> ${gameState.moduleResults.administracion.correct}/5</p>
+        <p><strong>Recursos Humanos:</strong> ${gameState.moduleResults.recursos.correct}/5</p>
+        <p><strong>Logística:</strong> ${gameState.moduleResults.logistica.correct}/5</p>
+        <hr style="margin: 20px 0;">
+        <p><strong>Total:</strong> ${gameState.correctAnswers}/${totalQuestions} (${percentage}%)</p>
+        <p><strong>Estado:</strong> ${gameState.bicefaloWasPurified ? '🏆 Bicéfalo Purificado' : '💀 Bicéfalo Aún Vive'}</p>
+    `;
+    document.querySelectorAll('.scenario').forEach(s => s.classList.remove('active'));
+    document.getElementById('finalReport').classList.add('active');
+        }
+
+
+        function restartGame() {
+ playButtonSound();
+            gameState = {
+                currentScenario: 1,
+                currentModule: '',
+                currentQuestion: 0,
+                correctAnswers: 0,
+                wrongAnswers: 0,
+                completedModules: [],
+                bicefaloWasPurified: false,
+                moduleResults: {
+                    administracion: { correct: 0, total: 5 },
+                    recursos: { correct: 0, total: 5 },
+                    logistica: { correct: 0, total: 5 }
+                }
+            };
+            
+            // Rehabilitar todos los botones de módulos
+            ['administracion', 'recursos', 'logistica'].forEach(module => {
+                const button = document.getElementById(`btn-${module}`);
+                if (button) {
+                    button.disabled = false;
+                    button.classList.remove('completed');
+                }
+            });
+            
+            document.body.style.background = 'black';
+            document.getElementById('scoreDisplay').style.display = 'none';
+            document.getElementById('progressBar').style.width = '0%';
+            
+            updateScore();
+            nextScenario(1);
+        }
+
+        // Inicializar el juego
+        updateScore();
+    </script>
+</body>
+</html>
